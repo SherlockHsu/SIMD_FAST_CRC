@@ -23,7 +23,8 @@ int main()
     struct timeval start, end;
     long timeuse;
 #endif
-    double run_time;
+    double run_time_decide;
+    double run_time_crc;
     int i;
     int B = 8448;
     int loop = 1e3;
@@ -32,7 +33,7 @@ int main()
     uint8_t *bits = (uint8_t *)malloc(sizeof(uint8_t) * bn);
     for (i = 0; i < B; i++)
         llr[i] = i % 2 ? -2 : 2;
-    
+
     nr5g_crc_t crc_t;
     nr5g_crc_init(&crc_t, CRC_24A, 24);
 
@@ -47,19 +48,41 @@ int main()
 
     for (i = 0; i < loop; i++)
         fast_decide_avx512(llr, B, bits);
-    nr5g_crc_checksum_byte(&crc_t, bits, B);    
 
 #if defined(_MSC_VER)
     QueryPerformanceCounter(&num);
     end = num.QuadPart;
-    run_time += (double)(end - start) / freq;
+    run_time_decide += (double)(end - start) / freq;
 #else
     gettimeofday(&end, NULL);
     timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
-    run_time += (double)timeuse / 1000000.0;
+    run_time_decide += (double)timeuse / 1000000.0;
 #endif
 
-    printf("run_time:\t%lfus\n", run_time * 1e3);
+#if defined(_MSC_VER)
+    QueryPerformanceFrequency(&num);
+    freq = num.QuadPart;
+    QueryPerformanceCounter(&num);
+    start = num.QuadPart;
+#else
+    gettimeofday(&start, NULL);
+#endif
+
+    for (i = 0; i < loop; i++)
+        nr5g_crc_checksum_byte(&crc_t, bits, B);
+
+#if defined(_MSC_VER)
+    QueryPerformanceCounter(&num);
+    end = num.QuadPart;
+    run_time_decide += (double)(end - start) / freq;
+#else
+    gettimeofday(&end, NULL);
+    timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
+    run_time_decide += (double)timeuse / 1000000.0;
+#endif
+
+    printf("run_time_decide:\t%lfus\n", run_time_decide * 1e3);
+    printf("run_time_crc:\t%lfus\n", run_time_crc * 1e3);
     free(llr);
     free(bits);
 
