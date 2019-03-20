@@ -34,3 +34,8 @@ int fast_decide_avx512(const int8_t *input, int len, uint8_t *output)
 
     return 0;
 }
+
+int fast_crc_checksum_avx512(const int8_t *input, int len, uint32_t crc_poly, int crc_order, uint8_t *output)
+{
+    
+}
