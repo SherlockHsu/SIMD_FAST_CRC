@@ -27,7 +27,7 @@ int main()
     double run_time_crc;
     int i;
     int B = 8448;
-    int loop = 1e3;
+    int loop = 1e6;
     int bn = (B - 1) / 8 + 1;
     int8_t *llr = (int8_t *)malloc(sizeof(int8_t) * B);
     uint8_t *bits = (uint8_t *)malloc(sizeof(uint8_t) * bn);
@@ -74,11 +74,11 @@ int main()
 #if defined(_MSC_VER)
     QueryPerformanceCounter(&num);
     end = num.QuadPart;
-    run_time_decide += (double)(end - start) / freq;
+    run_time_crc += (double)(end - start) / freq;
 #else
     gettimeofday(&end, NULL);
     timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
-    run_time_decide += (double)timeuse / 1000000.0;
+    run_time_crc += (double)timeuse / 1000000.0;
 #endif
 
     printf("run_time_decide:\t%lfus\n", run_time_decide * 1e3);
