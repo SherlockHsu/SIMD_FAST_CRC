@@ -18,7 +18,7 @@ int fast_decide_avx512(const int8_t *input, int len, uint8_t *output)
 
     for (i = 0; i < units; ++i)
     {
-        input_zmm = _mm512_loadu_epi8(pi);
+        input_zmm = _mm512_loadu_si512(pi);
         output_m64 = _mm512_cmp_epi8_mask(input_zmm, zero_zmm, 1);
         _store_mask64(po, output_m64);
         pi += 64;
@@ -27,7 +27,7 @@ int fast_decide_avx512(const int8_t *input, int len, uint8_t *output)
     if (remain)
     {
         units = (remain - 1) / 8 + 1;
-        input_zmm = _mm512_loadu_epi8(pi);
+        input_zmm = _mm512_loadu_si512(pi);
         output_m64 = _mm512_cmp_epi8_mask(input_zmm, zero_zmm, 1);
         memcpy(po, &output_m64, units);
     }
