@@ -45,4 +45,18 @@ uint32_t nr5g_crc_checksum_byte(nr5g_crc_t *h,
                                 uint8_t *data,
                                 int len);
 
+
+uint32_t nr5g_crc_checksum_16(nr5g_crc_t *h, uint8_t *data, int len);
+
+static inline void nr5g_crc_checksum_put_16(nr5g_crc_t *h, uint16_t byte)
+{
+
+    // Polynom order 8, 16, 24 or 32 only.
+    int ord = h->order - 16;
+    uint64_t crc = h->crcinit;
+
+    crc = (crc << 16) ^ h->table[((crc >> (ord)) & 0xffff) ^ byte];
+    h->crcinit = crc;
+}
+
 #endif

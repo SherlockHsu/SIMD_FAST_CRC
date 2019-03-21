@@ -77,9 +77,8 @@ uint32_t nr5g_crc_checksum_byte(nr5g_crc_t *h, uint8_t *data, int len)
 
     // Calculate CRC
     for (i = 0; i < len / 8; i++)
-    {
         nr5g_crc_checksum_put_byte(h, data[i]);
-    }
+
     crc = (uint32_t)nr5g_crc_checksum_get(h);
 
     return crc;
@@ -95,4 +94,22 @@ uint32_t nr5g_crc_attach_byte(nr5g_crc_t *h, uint8_t *data, int len)
         data[len / 8 + (h->order / 8 - i - 1)] = (checksum & (0xff << (8 * i))) >> (8 * i);
     }
     return checksum;
+}
+
+uint32_t nr5g_crc_checksum_16(nr5g_crc_t *h, uint8_t *data, int len)
+{
+    int i;
+    uint32_t crc = 0;
+
+    nr5g_crc_set_init(h, 0);
+
+    uint16_t *data16 = (uint16_t *)data;
+
+    // Calculate CRC
+    for (i = 0; i < len / 16; i++)
+        nr5g_crc_checksum_put_16(h, data16[i]);
+        
+    crc = (uint32_t)nr5g_crc_checksum_get(h);
+
+    return crc;
 }
