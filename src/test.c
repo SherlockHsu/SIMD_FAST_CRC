@@ -25,6 +25,7 @@ int main()
 #endif
     double run_time_dec;
     double run_time_crc;
+    double run_time_ext;
     int i, res;
     int B = 8448;
     int loop = 1e6;
@@ -53,7 +54,7 @@ int main()
 #endif
 
     for (i = 0; i < loop; i++)
-        fast_compress_avx512(llr, B, _MM_CMPINT_LT, bits);
+        fast_decide_avx512(llr, B, _MM_CMPINT_LT, bits);
 
 #if defined(_MSC_VER)
     QueryPerformanceCounter(&num);
@@ -65,7 +66,27 @@ int main()
     run_time_dec += (double)timeuse / 1000000.0;
 #endif
 
-    fast_extend_avx512(bits, B / 8, llr);
+#if defined(_MSC_VER)
+    QueryPerformanceFrequency(&num);
+    freq = num.QuadPart;
+    QueryPerformanceCounter(&num);
+    start = num.QuadPart;
+#else
+    gettimeofday(&start, NULL);
+#endif
+
+    for (i = 0; i < loop; i++)
+        fast_extend_avx512(bits, B / 8, llr);
+#if defined(_MSC_VER)
+    QueryPerformanceCounter(&num);
+    end = num.QuadPart;
+    run_time_ext += (double)(end - start) / freq;
+#else
+    gettimeofday(&end, NULL);
+    timeuse = 1000000 * (end.tv_sec - start.tv_sec) + end.tv_usec - start.tv_usec;
+    run_time_ext += (double)timeuse / 1000000.0;
+#endif
+
 
 #if defined(_MSC_VER)
     QueryPerformanceFrequency(&num);
@@ -89,9 +110,10 @@ int main()
     run_time_crc += (double)timeuse / 1000000.0;
 #endif
 
-    printf("run_time_dec:\t%lfms\n", run_time_dec * 1e3);
-    printf("run_time_crc:\t%lfms\n", run_time_crc * 1e3);
-    printf("CRC Result:\t%d\n", res);
+    printf("run_time_dec:\t%lfs\n", run_time_dec);
+    printf("run_time_ext:\t%lfs\n", run_time_ext);
+    printf("run_time_crc:\t%lfs\n", run_time_crc);
+    // printf("CRC Result:\t%d\n", res);
     free(llr);
     free(bits);
 

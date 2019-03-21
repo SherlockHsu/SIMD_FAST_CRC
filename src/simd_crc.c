@@ -5,7 +5,7 @@
 #include <string.h>
 #include <immintrin.h>
 
-int fast_compress_avx512(const int8_t *input, int len, int imm8, uint8_t *output)
+int fast_decide_avx512(const int8_t *input, int len, int imm8, uint8_t *output)
 {
     int i;
     int units = len / 64;
@@ -19,7 +19,7 @@ int fast_compress_avx512(const int8_t *input, int len, int imm8, uint8_t *output
     for (i = 0; i < units; ++i)
     {
         input_zmm = _mm512_loadu_si512(pi);
-        output_m64 = _mm512_cmp_epi8_mask(input_zmm, zero_zmm, imm8);
+        output_m64 = _mm512_cmp_epi8_mask(input_zmm, zero_zmm, _MM_CMPINT_LT);
         _store_mask64(po, output_m64);
         pi += 64;
         ++po;
@@ -28,7 +28,7 @@ int fast_compress_avx512(const int8_t *input, int len, int imm8, uint8_t *output
     {
         units = (remain - 1) / 8 + 1;
         input_zmm = _mm512_loadu_si512(pi);
-        output_m64 = _mm512_cmp_epi8_mask(input_zmm, zero_zmm, imm8);
+        output_m64 = _mm512_cmp_epi8_mask(input_zmm, zero_zmm, _MM_CMPINT_LT);
         memcpy(po, &output_m64, units);
     }
 
