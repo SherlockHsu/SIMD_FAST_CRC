@@ -65,7 +65,7 @@ int main()
     run_time_dec += (double)timeuse / 1000000.0;
 #endif
 
-        fast_extend_avx512(bits, B/8, llr);
+    fast_extend_avx512(bits, B / 8, llr);
 
 #if defined(_MSC_VER)
     QueryPerformanceFrequency(&num);
