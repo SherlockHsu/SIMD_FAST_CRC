@@ -54,7 +54,7 @@ int main()
 #endif
 
     for (i = 0; i < loop; i++)
-        fast_decide_avx512(llr, B, _MM_CMPINT_LT, bits);
+        fast_decide_avx512(llr, B, bits);
 
 #if defined(_MSC_VER)
     QueryPerformanceCounter(&num);
