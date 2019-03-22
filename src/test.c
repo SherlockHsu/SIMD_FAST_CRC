@@ -11,8 +11,8 @@
 #include <sys/time.h>
 #endif
 
-#define CRC_24A 0x864CFB
-#define CRC_16 0x1021
+#define CRC_24A 0x1864CFB
+#define CRC_16 0x11021
 
 int main()
 {
